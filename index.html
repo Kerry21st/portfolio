@@ -10,6 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 
+<!-- Devicon — иконки языков/фреймворков/инструментов для кругового стека в секции Skills -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
 <!-- Тема применяется ДО отрисовки страницы, чтобы не было "мигания" светлой темой при загрузке -->
 <script>
   (function(){
@@ -363,22 +366,141 @@
   }
   .logo-row span:hover{ color:var(--text); }
 
-  /* ===================== SKILLS ===================== */
+  /* ===================== SKILLS — круговой стек технологий ===================== */
   #skills{ background:var(--bg); transition:background .35s ease; }
-  .skills-grid{ display:grid; grid-template-columns:repeat(3, 1fr); border-top:1px solid var(--line); }
-  @media(max-width:820px){ .skills-grid{ grid-template-columns:1fr; } }
-  .skill-col{ padding:30px 30px 30px 0; border-bottom:1px solid var(--line); }
-  .skills-grid .skill-col:not(:last-child){ border-right:1px solid var(--line); }
-  @media(max-width:820px){ .skills-grid .skill-col{ border-right:none !important; padding-right:0; } }
-  .skill-col h3{ font-size:18px; font-weight:700; margin-bottom:18px; }
-  .skill-tags{ display:flex; flex-wrap:wrap; gap:9px; }
-  .skill-tags span{
-    font-family:var(--font-mono); font-size:12.5px;
-    border:1px solid var(--line); border-radius:6px;
-    padding:6px 11px; color:var(--muted);
-    transition:border-color .2s, color .2s;
+
+  .tech-hint{
+    font-family:var(--font-mono); font-size:12px; color:var(--muted-2);
+    text-align:center; margin-bottom:8px;
   }
-  .skill-tags span:hover{ border-color:var(--accent); color:var(--accent); }
+
+  .tech-wheel{ display:flex; justify-content:center; padding:26px 0 6px; }
+
+  .tech-circle{
+    --dia: min(540px, 88vw);      /* диаметр круга */
+    --radius: calc(var(--dia) / 2 - 40px); /* расстояние от центра до иконок */
+    position:relative;
+    width:var(--dia); height:var(--dia);
+    border-radius:50%;
+    border:1px dashed var(--line);
+    flex-shrink:0;
+  }
+  /* второе, внутреннее кольцо — просто для визуальной глубины */
+  .tech-circle::before{
+    content:""; position:absolute; inset:15%;
+    border-radius:50%; border:1px solid var(--line); opacity:.6;
+  }
+
+  /* Центр круга — статичный лейбл, при наведении на иконку подменяется на её название */
+  .tech-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; text-align:center; pointer-events:none; padding:0 20%;
+  }
+  .tech-center-label{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(19px, 2.6vw, 26px); color:var(--text);
+    transition:color .2s ease;
+  }
+  .tech-center-sub{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted-2);
+  }
+
+  /* Одна иконка-слот на круге. Классический приём:
+     rotate(угол) translate(0,-radius) rotate(-угол) — ставит элемент
+     на круг под нужным углом и сразу же выравнивает его обратно,
+     чтобы сама иконка внутри осталась "прямой", а не повёрнутой. */
+  .tech-item{
+    position:absolute; top:50%; left:50%;
+    width:60px; height:60px; margin:-30px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:var(--bg-alt); border:1px solid var(--line);
+    cursor:pointer; padding:0;
+    transform:
+      rotate(calc(360deg / var(--count) * var(--i)))
+      translate(0, calc(-1 * var(--radius)))
+      rotate(calc(-360deg / var(--count) * var(--i)));
+    transition:transform .3s cubic-bezier(.16,.8,.3,1), border-color .25s ease, background .25s ease, box-shadow .25s ease;
+  }
+  .tech-item i{
+    font-size:26px; line-height:1; color:var(--muted);
+    transition:color .25s ease;
+  }
+  .tech-item:hover,
+  .tech-item:focus-visible{
+    border-color:var(--accent);
+    background:var(--bg);
+    box-shadow:0 14px 28px -16px rgba(0,0,0,.35);
+    transform:
+      rotate(calc(360deg / var(--count) * var(--i)))
+      translate(0, calc(-1 * var(--radius)))
+      rotate(calc(-360deg / var(--count) * var(--i)))
+      scale(1.14);
+    z-index:5;
+  }
+  .tech-item:hover i,
+  .tech-item:focus-visible i{ color:var(--accent); }
+  .tech-item:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* Подпись-tooltip. По умолчанию всплывает НАД иконкой; для нижней половины
+     круга (модификатор ниже) — под иконкой, чтобы не перекрывать центр */
+  .tech-tip{
+    position:absolute; bottom:calc(100% + 11px); left:50%;
+    transform:translateX(-50%) translateY(4px);
+    background:var(--text); color:var(--bg);
+    font-family:var(--font-mono); font-size:11px; font-weight:500;
+    padding:5px 10px; border-radius:6px; white-space:nowrap;
+    opacity:0; pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .tech-tip::after{
+    content:""; position:absolute; top:100%; left:50%;
+    transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:var(--text);
+  }
+  .tech-item--tip-below .tech-tip{ bottom:auto; top:calc(100% + 11px); }
+  .tech-item--tip-below .tech-tip::after{
+    top:auto; bottom:100%;
+    border-top-color:transparent; border-bottom-color:var(--text);
+  }
+  .tech-item:hover .tech-tip,
+  .tech-item:focus-visible .tech-tip{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* На узких экранах круг превращается в обычную grid-сетку —
+     позиционирование по кругу на такой ширине только мешало бы */
+  @media(max-width:680px){
+    .tech-hint{ display:none; }
+    .tech-circle{
+      width:100%; height:auto;
+      border:none; display:grid;
+      grid-template-columns:repeat(4, 1fr); gap:12px;
+    }
+    .tech-circle::before{ display:none; }
+    .tech-center{ display:none; }
+    .tech-item{
+      position:static; margin:0; width:auto; height:auto;
+      aspect-ratio:1/1; flex-direction:column; gap:8px; padding:12px 4px;
+      border-radius:14px; transform:none;
+    }
+    .tech-item:hover, .tech-item:focus-visible{
+      transform:translateY(-3px); box-shadow:0 10px 20px -12px rgba(0,0,0,.3);
+    }
+    .tech-item i{ font-size:24px; }
+    .tech-tip{
+      position:static; opacity:1; pointer-events:none; transform:none;
+      background:transparent; color:var(--muted); font-size:10px;
+      font-weight:400; padding:0; white-space:normal; text-align:center;
+      letter-spacing:0;
+    }
+    .tech-tip::after{ display:none; }
+    .tech-item:hover .tech-tip,
+    .tech-item:focus-visible .tech-tip{ transform:none; }
+  }
+  @media(max-width:400px){
+    .tech-circle{ grid-template-columns:repeat(3, 1fr); }
+  }
 
   /* ===================== PROJECTS — нумерованный список ===================== */
   #projects{ background:var(--bg-alt-2); transition:background .35s ease; }
@@ -633,26 +755,13 @@
     <h2 class="section-title reveal d1">Стек технологий</h2>
     <p class="section-sub reveal d2">То, на чём собраны проекты ниже — без раздутого списка «знаю всё на свете».</p>
 
-    <div class="skills-grid reveal d3">
-      <div class="skill-col">
-        <h3>Frontend</h3>
-        <div class="skill-tags">
-          <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
-          <span>Vanilla JS</span><span>GSAP</span><span>Адаптив</span>
-        </div>
-      </div>
-      <div class="skill-col">
-        <h3>Backend</h3>
-        <div class="skill-tags">
-          <span>PHP 8</span><span>MySQL</span><span>Python</span>
-          <span>REST-логика</span><span>Llama / LLM</span>
-        </div>
-      </div>
-      <div class="skill-col">
-        <h3>Инструменты</h3>
-        <div class="skill-tags">
-          <span>Git</span><span>Figma</span><span>VS Code</span>
-          <span>Linux / bash</span><span>Postman</span>
+    <div class="tech-hint reveal d3">Наведите на иконку →</div>
+    <div class="tech-wheel reveal d3">
+      <!-- --count проставляется в JS (buildTechWheel), сами иконки — тоже -->
+      <div class="tech-circle" id="techCircle">
+        <div class="tech-center">
+          <span class="tech-center-label" id="techCenterLabel">Стек</span>
+          <span class="tech-center-sub" id="techCenterSub"></span>
         </div>
       </div>
     </div>
@@ -862,7 +971,83 @@ menuOverlay.querySelectorAll('a').forEach(a =>
 );
 
 /* =========================================================
-   5) Счётчик чисел в блоке статистики
+   5) Круговой стек технологий (секция Skills)
+   Один источник правды — массив TECH_STACK. Круг сам пересчитает
+   углы под любое количество элементов (360° / count), так что
+   добавить/убрать технологию — это правка одной строки массива.
+========================================================= */
+const TECH_STACK = [
+  { icon: 'devicon-html5-plain',       name: 'HTML5' },
+  { icon: 'devicon-css3-plain',        name: 'CSS3' },
+  { icon: 'devicon-sass-original',     name: 'SCSS' },
+  { icon: 'devicon-javascript-plain',  name: 'JavaScript' },
+  { icon: 'devicon-vuejs-plain',       name: 'Vue.js' },
+  { icon: 'devicon-php-plain',         name: 'PHP' },
+  { icon: 'devicon-laravel-original',  name: 'Laravel' },
+  { icon: 'devicon-mysql-original',    name: 'MySQL' },
+  { icon: 'devicon-python-plain',      name: 'Python' },
+  { icon: 'devicon-git-plain',         name: 'Git' },
+  { icon: 'devicon-vscode-plain',      name: 'VS Code' },
+  { icon: 'devicon-figma-plain',       name: 'Figma' },
+  { icon: 'devicon-github-original',   name: 'GitHub' },
+];
+
+const techCircle = document.getElementById('techCircle');
+const techCenterLabel = document.getElementById('techCenterLabel');
+const techCenterSub = document.getElementById('techCenterSub');
+
+function resetTechCenter(){
+  techCenterLabel.textContent = 'Стек';
+  techCenterSub.textContent = `${TECH_STACK.length} технологий`;
+}
+
+function buildTechWheel(){
+  const count = TECH_STACK.length;
+  techCircle.style.setProperty('--count', count);
+
+  TECH_STACK.forEach((tech, i) => {
+    const angle = i * (360 / count);
+    // нижняя половина круга (90°–270°) — подпись уходит ПОД иконку,
+    // иначе tooltip всплывал бы поверх центрального лейбла
+    const isLowerHalf = angle > 90 && angle < 270;
+
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'tech-item' + (isLowerHalf ? ' tech-item--tip-below' : '');
+    item.style.setProperty('--i', i);
+    item.setAttribute('aria-label', tech.name);
+
+    const icon = document.createElement('i');
+    icon.className = tech.icon;
+    icon.setAttribute('aria-hidden', 'true');
+
+    const tip = document.createElement('span');
+    tip.className = 'tech-tip';
+    tip.textContent = tech.name;
+    tip.setAttribute('aria-hidden', 'true');
+
+    item.append(icon, tip);
+    techCircle.appendChild(item);
+
+    const activate = () => {
+      techCenterLabel.textContent = tech.name;
+      techCenterSub.textContent = `${i + 1} / ${count}`;
+    };
+    item.addEventListener('mouseenter', activate);
+    item.addEventListener('focus', activate);
+  });
+
+  techCircle.addEventListener('mouseleave', resetTechCenter);
+  techCircle.addEventListener('focusout', (e) => {
+    if (!techCircle.contains(e.relatedTarget)) resetTechCenter();
+  });
+}
+
+buildTechWheel();
+resetTechCenter();
+
+/* =========================================================
+   6) Счётчик чисел в блоке статистики
 ========================================================= */
 const statEls = document.querySelectorAll('.num .count');
 const statObserver = new IntersectionObserver((entries) => {
@@ -890,7 +1075,7 @@ const statObserver = new IntersectionObserver((entries) => {
 statEls.forEach(el => statObserver.observe(el));
 
 /* =========================================================
-   6) Форма обратной связи (UI-демо)
+   7) Форма обратной связи (UI-демо)
    ВАЖНО: форма пока не отправляет данные на сервер.
    Чтобы письма реально приходили, подключите Formspree /
    EmailJS / свой backend и замените блок ниже на fetch().
