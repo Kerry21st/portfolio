@@ -23,7 +23,7 @@
       document.documentElement.setAttribute('data-theme', theme);
     } catch(e){ /* localStorage недоступен — остаёмся на светлой теме по умолчанию */ }
   })();
-</script> 
+</script>
 
 <style>
   /* =========================================================
@@ -519,6 +519,7 @@
   .proj-swatch.sw2{ background:linear-gradient(135deg, #2c2c2e, #6b6b6b); }
   .proj-swatch.sw3{ background:linear-gradient(135deg, #4a3424, #c2491f); }
   .proj-swatch.sw4{ background:linear-gradient(135deg, #1d1d1f, #51463a); }
+  .proj-swatch.sw5{ background:linear-gradient(135deg, #2c3236, #6d7580); }
 
   .proj-info .name{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:19px; font-weight:700; margin-bottom:6px; }
   .proj-info .name .badge{
@@ -773,7 +774,7 @@
   <div class="wrap">
     <div class="eyebrow reveal">Проекты</div>
     <h2 class="section-title reveal d1">Что я собрал</h2>
-    <p class="section-sub reveal d2">Четыре проекта, четыре разные задачи — от интернет-магазина до голосового ассистента.</p>
+    <p class="section-sub reveal d2">Пять проектов, пять разных задач — от интернет-магазина до погодного сервиса.</p>
 
     <div class="proj-list reveal d3">
 
@@ -803,7 +804,7 @@
         <div class="proj-meta">
           <div class="proj-stack">HTML · CSS · GSAP</div>
           <div class="proj-links">
-            <a href="https://github.com/Kerry21st" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
+            <a href="https://github.com/Kerry21st/Parallax-Forest" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
           </div>
         </div>
       </div>
@@ -818,7 +819,7 @@
         <div class="proj-meta">
           <div class="proj-stack">Python · Llama</div>
           <div class="proj-links">
-            <a href="https://github.com/Kerry21st" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
+            <a href="https://github.com/Kerry21st/voice-assistant-axis" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
           </div>
         </div>
       </div>
@@ -833,7 +834,22 @@
         <div class="proj-meta">
           <div class="proj-stack">HTML · CSS · JS</div>
           <div class="proj-links">
-            <a href="https://github.com/Kerry21st" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
+            <a href="https://github.com/Kerry21st/HockeyPro" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-row">
+        <div class="proj-num">/05</div>
+        <div class="proj-swatch sw5"></div>
+        <div class="proj-info">
+          <div class="name">Weather App</div>
+          <div class="desc">Погодное приложение с поиском города, геолокацией, почасовым и недельным прогнозом и интерактивной картой осадков — без бэкенда, только клиент.</div>
+        </div>
+        <div class="proj-meta">
+          <div class="proj-stack">JavaScript · Leaflet · Open-Meteo</div>
+          <div class="proj-links">
+            <a href="https://github.com/Kerry21st/weather-app" target="_blank" rel="noopener" class="proj-icon-link" title="GitHub">GH</a>
           </div>
         </div>
       </div>
@@ -979,8 +995,6 @@ menuOverlay.querySelectorAll('a').forEach(a =>
 const TECH_STACK = [
   { icon: 'devicon-html5-plain',       name: 'HTML5' },
   { icon: 'devicon-css3-plain',        name: 'CSS3' },
-  { icon: 'devicon-sass-original',     name: 'SCSS' },
-  { icon: 'devicon-tailwindcss-original', name: 'Tailwind CSS' },
   { icon: 'devicon-javascript-plain',  name: 'JavaScript' },
   { icon: 'devicon-vuejs-plain',       name: 'Vue.js' },
   { icon: 'devicon-php-plain',         name: 'PHP' },
