@@ -943,12 +943,16 @@
         </a>
       </div>
 
-      <form id="contactForm" class="reveal d4">
+      
+      <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="reveal d4">
+        <input type="hidden" name="form-name" value="contact">
+        <p style="display:none"><label>Не заполняйте: <input name="bot-field"></label></p>
+        <!-- остальные поля как есть: name, email, message -->
         <div class="field">
           <label for="name">Имя</label>
           <input type="text" id="name" name="name" placeholder="Как к вам обращаться" required>
         </div>
-        <div class="field">
+        <div class="field">                            
           <label for="email">Email</label>
           <input type="email" id="email" name="email" placeholder="you@example.com" required>
         </div>
@@ -1132,11 +1136,21 @@ statEls.forEach(el => statObserver.observe(el));
 ========================================================= */
 const form = document.getElementById('contactForm');
 const formMsg = document.getElementById('formMsg');
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = form.name.value.trim();
-  formMsg.textContent = `Спасибо, ${name || 'друг'}! Сообщение готово к отправке — осталось подключить backend.`;
-  form.reset();
+  try {
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString(),
+    });
+    if (!res.ok) throw new Error();
+    formMsg.textContent = `Спасибо, ${name || 'друг'}! Сообщение отправлено.`;
+    form.reset();
+  } catch {
+    formMsg.textContent = 'Не удалось отправить. Попробуйте ещё раз.';
+  }
 });
 </script>
 
