@@ -944,6 +944,7 @@
       </div>
 
       <form id="contactForm" class="reveal d4">
+        <p style="display:none"><label>Не заполняйте: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="field">
           <label for="name">Имя</label>
           <input type="text" id="name" name="name" placeholder="Как к вам обращаться" required>
@@ -1125,18 +1126,31 @@ const statObserver = new IntersectionObserver((entries) => {
 statEls.forEach(el => statObserver.observe(el));
 
 /* =========================================================
-   7) Форма обратной связи (UI-демо)
-   ВАЖНО: форма пока не отправляет данные на сервер.
-   Чтобы письма реально приходили, подключите Formspree /
-   EmailJS / свой backend и замените блок ниже на fetch().
+   7) Форма обратной связи
+   Отправляет сообщение в Netlify Function (/api/contact),
+   которая пересылает его в Telegram.
 ========================================================= */
 const form = document.getElementById('contactForm');
 const formMsg = document.getElementById('formMsg');
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = form.name.value.trim();
-  formMsg.textContent = `Спасибо, ${name || 'друг'}! Сообщение готово к отправке — осталось подключить backend.`;
-  form.reset();
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  formMsg.textContent = 'Отправляю…';
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      body: new FormData(form),
+    });
+    if (!res.ok) throw new Error();
+    formMsg.textContent = `Спасибо, ${name || 'друг'}! Сообщение отправлено.`;
+    form.reset();
+  } catch {
+    formMsg.textContent = 'Не удалось отправить. Попробуйте ещё раз.';
+  } finally {
+    btn.disabled = false;
+  }
 });
 </script>
 
